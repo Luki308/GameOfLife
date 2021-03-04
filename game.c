@@ -28,7 +28,7 @@ int alive_neighbours(int row, int column, world_t world) //counting neighbours
         {
             if (i >= 0 && i<row && j >= 0 && j < column && i!=j) //checking if neighbour is in world's boundaries and if it's cell itself
             {
-                if (world->cells[i][j] == 1)
+                if (world->cells[i][j] == '1')
                     alive++;
             }
         }
@@ -38,20 +38,20 @@ int alive_neighbours(int row, int column, world_t world) //counting neighbours
 
 char apply_rules(int alive, char cell, world_t world) //changing cells
 {
-            if (cell == 0)
+            if (cell == '0')
                 for (int i = 0; i < bbc; i++)
                     if (alive == be_born_condtion[i])   return 2;
 
-            if (cell == 1)
+            if (cell == '1')
             {
                 for (int i = 0; i < sac; i++)
                 {
                     if (alive == stay_alive_condition[i])
                     {
-                        return 1;
+                        return '1';
                     }
                 }
-                return 3;
+                return '3';
             }
                   
 }
@@ -62,13 +62,13 @@ void update_world(world_t world)  // changing 2->1 3->0
     {
         for (int j = column - 1; j < column + 1; j++)
         {
-            if (world->cells[i][j] == 2)
+            if (world->cells[i][j] == '2')
             {
-                world->cells[i][j] = 1;
+                world->cells[i][j] = '1';
             }
-            if (world->cells[i][j] == 3)
+            if (world->cells[i][j] == '3')
             {
-                world->cells[i][j] = 0;
+                world->cells[i][j] = '0';
             }
         }
     }
