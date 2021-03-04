@@ -1,5 +1,5 @@
-GameOfLife: main.o
-	$(CC) -o GameOfLife main.o
+GameOfLife: main.o data.o
+	$(CC) -o GameOfLife main.o data.o
 
 .PHONY: clean clean_all
 
