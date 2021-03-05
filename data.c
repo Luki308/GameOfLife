@@ -112,12 +112,7 @@ world_t create_world(char *filename)
     return world;
 }
 
-void store_world(world_t world)
-{
-    printf("It's a placeholder\n");
-}
-
-void print_world(world_t world, char all_info)
+void print_world(world_t world, FILE *output, char all_info)
 {
     if(world == NULL)
     {
@@ -126,13 +121,24 @@ void print_world(world_t world, char all_info)
     }
 
     if(all_info)
-        printf("Rows: %d   Columns: %d\n", world->rows, world->columns);
+        fprintf(output, "%d %d\n", world->rows, world->columns);
 
     for(int i = 0; i < world->rows; i++)
     {
         for(int j = 0; j < world->columns; j++)
-            printf("%c ", world->cells[i][j]);
-        printf("\n");
+            fprintf(output, "%c ", world->cells[i][j]);
+        fprintf(output, "\n");
     }            
-    printf("\n");
+    fprintf(output, "\n");
+}
+
+void store_world(world_t world, char *filename)
+{
+    FILE *out = fopen(filename, "w");
+    if(out == NULL)
+    {
+        fprintf(stderr, "Cannot write to file: %s!\n", filename);
+        return;
+    }
+    print_world(world, out, 1);
 }
