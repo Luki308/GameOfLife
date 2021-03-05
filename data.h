@@ -7,10 +7,10 @@ typedef struct w {
     char **cells; 
 } *world_t;
 
-
 world_t alloc_world(int rows, int columns);
 void free_world(world_t world);
 world_t create_world(char *filename);
 void store_world(world_t world);
+void print_world(world_t world, char all_info);
 
 # endif
