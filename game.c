@@ -26,7 +26,7 @@ int alive_neighbours(int row, int column, world_t world) //counting neighbours
     {
         for (int j = column-1; j <column+1; j++)
         {
-            if (i >= 0 && i<row && j >= 0 && j < column && i!=j) //checking if neighbour is in world's boundaries and if it's cell itself
+            if (i >= 0 && i<world->row && j >= 0 && j < world-> column && i!=j) //checking if neighbour is in world's boundaries and if it's cell itself
             {
                 if (world->cells[i][j] == '1')
                     alive++;
