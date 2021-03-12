@@ -2,11 +2,30 @@
 #include "const_char_arrays.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-static const char cell_states[2] = { '0', '1' };
-static const int cs = sizeof cell_states / sizeof cell_states[0];
+#define BUFFER_SIZE 256 // max length of input word (only first letter matters)
 
-world_t alloc_world(int rows, int columns)
+const char cell_states[2] = { '0', '1' };
+const int number_of_cell_states = sizeof cell_states / sizeof cell_states[0];
+
+
+void free_world(world_t world) // cleans memory after world usage
+{
+    if(world != NULL)
+    {
+        if(world->cells != NULL)
+        {
+            for(int i = 0; i < world->rows; i++)
+                if(world->cells[i] != NULL)
+                    free(world->cells[i]);
+            free(world->cells);
+        }
+        free(world);
+    }
+}
+
+world_t alloc_world(int rows, int columns) // allocs memory for world
 {
     world_t world = malloc(sizeof(*world));
     if(world == NULL)
@@ -19,7 +38,7 @@ world_t alloc_world(int rows, int columns)
     if(world->cells == NULL)
     {
         fprintf(stderr, "Cannot alloc enough memory for cells' pointers!\n");
-        free(world);
+        free_world(world);
         return NULL;
     }
 
@@ -29,10 +48,7 @@ world_t alloc_world(int rows, int columns)
         if(world->cells[i] == NULL)
         {
             fprintf(stderr, "Cannot alloc enough memory for all cells! Problem in row (from 0): %d\n", i);
-            for(int j = 0; j < i; j++)
-                free(world->cells[j]);
-            free(world->cells);
-            free(world);
+            free_world(world);
             return NULL;
         }
     }
@@ -40,15 +56,7 @@ world_t alloc_world(int rows, int columns)
     return world;
 }
 
-void free_world(world_t world)
-{
-    for(int i = 0; i < world->rows; i++)
-        free(world->cells[i]);
-    free(world->cells);
-    free(world);
-}
-
-world_t create_world(char *filename)
+world_t create_world(char *filename) // reads world from file
 {
     FILE *in = fopen(filename, "r");
     if(in == NULL)
@@ -83,7 +91,7 @@ world_t create_world(char *filename)
     world->rows = r;
     world->columns = c;
 
-    char buffer[256];
+    char buffer[BUFFER_SIZE];
     for(int i = 0; i < world->rows; i++)
         for(int j = 0; j < world->columns; j++)
         {
@@ -97,12 +105,12 @@ world_t create_world(char *filename)
 
             world->cells[i][j] = buffer[0];
 
-            if(!check_if_char_in_array(world->cells[i][j], cell_states, cs))
+            if(!check_if_char_in_array(world->cells[i][j], cell_states, number_of_cell_states))
             {
                 fprintf(stderr, "Wrong data format in: %s! Illegal cell's state!\n", filename);
                 fprintf(stderr, "Row: %d   Column: %d\n", i, j);
                 fprintf(stderr, "There is no '%c' in: ", world->cells[i][j]);
-                print_const_char_array(cell_states, cs, stderr);
+                print_const_char_array(cell_states, number_of_cell_states, stderr);
                 free_world(world);
                 fclose(in);
                 return NULL;
@@ -112,15 +120,15 @@ world_t create_world(char *filename)
     return world;
 }
 
-void print_world(world_t world, FILE *output, char all_info)
+void print_world(world_t world, FILE *output, bool size_info) // writes world on given output
 {
     if(world == NULL)
     {
-        fprintf(stderr, "World is NULL!\n");
+        fprintf(stderr, "Cannot print world which is NULL!\n");
         return;
     }
 
-    if(all_info)
+    if(size_info)
         fprintf(output, "%d %d\n", world->rows, world->columns);
 
     for(int i = 0; i < world->rows; i++)
@@ -132,7 +140,7 @@ void print_world(world_t world, FILE *output, char all_info)
     fprintf(output, "\n");
 }
 
-void store_world(world_t world, char *filename)
+void store_world(world_t world, char *filename) // makes input file from current world
 {
     FILE *out = fopen(filename, "w");
     if(out == NULL)
