@@ -7,8 +7,8 @@
     Cell states and temporary states:
     0 - dead
     1 - alive
-    2 - being born
-    3 - dieing
+    2 - dying
+    3 - being born
 */
 
 // numbers in these conditions are represented by chars for lower memory usage and functions compatibility
@@ -40,7 +40,7 @@ int alive_neighbours(int row, int column, world_t world) //counting neighbours
         {
             if (i >= 0 && i < world->rows && j >= 0 && j < world->columns && (i != row || j != column)) //checking if neighbour is in world's boundaries and if it's cell itself
             {
-                if (world->cells[i][j] == '1' || world->cells[i][j] == '3')
+                if (world->cells[i][j] == '1' || world->cells[i][j] == '2')
                     alive++;
             }
         }
@@ -53,7 +53,7 @@ char apply_rules(int alive_neighbours, char cell) //changing cells
     if (cell == '0')
     {
         if (check_if_char_in_array(alive_neighbours+'0', be_born_condition , size_of_be_born_array))
-            return '2';
+            return '3';
         else 
             return '0';
     }
@@ -62,24 +62,18 @@ char apply_rules(int alive_neighbours, char cell) //changing cells
         if (check_if_char_in_array(alive_neighbours+'0', stay_alive_condition, size_of_stay_alive_array))
             return '1';
         else
-            return '3';           
+            return '2';           
     }
 }
 
-void update_world(world_t world)  // changing 2->1 3->0
+void update_world(world_t world)  // changing 3->1 2->0
 {
     for (int i = 0; i < world->rows; i++)
     {
         for (int j = 0; j < world->columns; j++)
         {
-            if (world->cells[i][j] == '2')
-            {
-                world->cells[i][j] = '1';
-            }
-            if (world->cells[i][j] == '3')
-            {
-                world->cells[i][j] = '0';
-            }
+            if (world->cells[i][j] == '2' || world->cells[i][j] == '3')
+                world->cells[i][j] -= 2;
         }
     }
 }
