@@ -23,9 +23,22 @@ void start_gif(char* name, int rows, int columns, int given_scale, int given_del
 
 void paint_frame(world_t world)
 {
-    for(int r = 0; r < scale * world->rows; r++)
-        for(int c = 0; c < scale * world->columns; c++)
-            gif->frame[r * scale * world->columns + c] = world->cells[r/scale][c/scale];
+    int prev_r = 0;
+    for(int r = 0; r/scale < world->rows; r++)
+    {
+        int prev_c = 0;
+        for(int c = 0; c/scale < world->columns; c++)
+            if(prev_r == r/scale && prev_c == c/scale)
+            {
+                gif->frame[r*scale*world->columns + c] = world->cells[r/scale][c/scale];
+            }
+            else
+            {
+                gif->frame[r*scale*world->columns + c] = 1;
+                if(prev_c != c/scale) prev_c++;
+            }
+        prev_r = r/scale;
+    }
     ge_add_frame(gif, delay);
 }
 
