@@ -44,7 +44,5 @@ void paint_frame(world_t world)
 
 void finish_gif()
 {
-    printf("%d\n",scale);
-    printf("%d\n",delay);
     ge_close_gif(gif);
 }
