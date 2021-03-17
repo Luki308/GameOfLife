@@ -27,14 +27,26 @@ int main(int argc, char **argv)
     usage();
     for (int i = 0;i < n;i++)
     {
-        char temp;
+        char* temp;
         int ni;
-        int j = i;
+        int j;
         printf("%i\n", i);
         printf("Operacja do wykonania:");
-        temp = getc(stdin);
-        temp = getc(stdin);
-        switch (temp)
+        /*temp = getc(stdin);
+        temp = getc(stdin);*/
+        if(scanf("%s", temp) != 1)
+        {
+            fprintf(stderr, "%s: Cannot read character\n", argv[0]);
+        }
+
+        if (strlen(temp) != 1)
+        {
+            fprintf(stderr, "\n%s: Wrong argument.\n Please use one from below\n", argv[0]);
+            usage();
+            i--;
+            continue;
+        }
+        switch (temp[0])
         {
         case 'a':
             while (i < n)
@@ -47,12 +59,14 @@ int main(int argc, char **argv)
         case 'f':
             printf("Ile iteracji do przodu:\n");
             scanf("%d", &ni);
-            while (i <= j + ni && i<n)
+            j = i;
+            while (i < j + ni && i<n)
             {
                 update(w);
                 paint_frame(w);
                 i++;
             }
+            i--;
             break;
         case 'n':
             update(w);
@@ -66,6 +80,9 @@ int main(int argc, char **argv)
             usage();
             i--;
            break;
+        default:
+            usage();
+            break;
         }
     }
     finish_gif();
