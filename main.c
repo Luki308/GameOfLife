@@ -5,11 +5,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h> 
 
 int main(int argc, char **argv)
 {
     world_t w = create_world(argv[1]);
+    if (w == NULL)
+        free_world(w);
     int n = argc > 2 ? atoi(argv[2]) : 10;
     char* gif_name = argc > 3 ? argv[3] : "gif.gif";
     int scale = argc > 4 ? atoi(argv[4]) : 50 ;
