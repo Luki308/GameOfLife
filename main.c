@@ -5,27 +5,45 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <math.h> 
 
 int main(int argc, char **argv)
 {
     world_t w = create_world(argv[1]);
-    int n = argc > 2 ? atoi(argv[2]) : 50;
+    int n = argc > 2 ? atoi(argv[2]) : 10;
     char* gif_name = argc > 3 ? argv[3] : "gif.gif";
+    int scale = argc > 4 ? atoi(argv[4]) : 50 ;
+    int delay = argc > 5 ? atoi(argv[5]) : 25 ;
+    
+    if (n == 0)
+    {
+        printf("%s: Wrong number of iterations. Changing to default number\n", argv[0]);
+        n = 10;
+    }
 
-    int scale;
-    int delay;
+    if ( strstr(gif_name, ".gif\0")==NULL)
+    {
+        printf("%s: Wrong gif filename. Changing to default name\n", argv[0]);
+        gif_name = "gif.gif";
+    }
 
-    printf("Ilukrotnie przeskalowac plik wynikowy gif:\n");
-    scanf("%d", &scale);
-    printf("Ile czasu ma minac pomiedzy kolejnymi iteracjami w pliku gif [ms]:\n");
-    scanf("%d", &delay);
+    if (scale==0)
+    {
+        printf("%s: Wrong scale. Changing to default number\n", argv[0]);
+        scale = 50;
+    }
+    if (delay==0)
+    {
+        printf("%s: Wrong delay. Changing to default number\n", argv[0]);
+        delay = 25;
+    }
+
     start_gif(gif_name, w->rows, w->columns, scale, delay);
     paint_frame(w);          //adding first frame to gif
     
-
     usage();
-    for (int i = 0;i < n;i++)
+    int i=0;
+    while (i < n)
     {
         char* temp;
         int ni;
@@ -43,7 +61,6 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "\n%s: Wrong argument.\n Please use one from below\n", argv[0]);
             usage();
-            i--;
             continue;
         }
         switch (temp[0])
@@ -66,19 +83,17 @@ int main(int argc, char **argv)
                 paint_frame(w);
                 i++;
             }
-            i--;
             break;
         case 'n':
             update(w);
             paint_frame(w);
+            i++;
             break;
         case 'd':
             print_world(w, stdout, 1);
-            i--;
             break;
         case 'h':
             usage();
-            i--;
            break;
         default:
             usage();
