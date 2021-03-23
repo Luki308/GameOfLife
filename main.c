@@ -1,41 +1,91 @@
 #include "data.h"
 #include "game_of_life.h"
 #include "gif_maker.h"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
+
+void programme_usage(char* argv)
+{
+    printf("Uzycie: %s\n"
+        "-w [nazwa_swiata] - czytanie z podanego pliku\n"
+        "-n [liczba_iteracji] - swiat zostanie wygenerowany do podanej generacji\n"
+        "-g [nazwa_gifu] - kolejne generacje beda zapisane do podanego pliku gif\n"
+        "-s [skala] - przeskalowanie wielkosci w pliku gif\n"
+        "-d [opoznienie] - z jakim opoznieniem beda pokazywane generacje w pliku gif\n"
+        , argv);
+}
 
 int main(int argc, char **argv)
 {
-    world_t w = create_world(argv[1]);
-    if (w == NULL)
-        free_world(w);
-    int n = argc > 2 ? atoi(argv[2]) : 10;
+    world_t w;
+    int n=0;
+    char* gif_name="";
+    int scale=0;
+    int delay=0;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "w:n:g:s:d:"))!= -1)
+    {
+        switch (opt)
+        {
+        case 'w':
+            w = create_world(optarg);
+            break;
+        case 'n':
+            n = atoi(optarg);
+            break;
+        case 'g':
+            gif_name = optarg;
+            break;
+        case 's':
+            scale = atoi(optarg);
+            break;
+        case 'd':
+            delay = atoi(optarg);
+            break;
+        default:
+            programme_usage(argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    if (argc == 1)
+    {
+        programme_usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+        
+    //world_t w = create_world(argv[1]);
+    //if (w == NULL)
+      // free_world(w);
+    /*int n = argc > 2 ? atoi(argv[2]) : 10;
     char* gif_name = argc > 3 ? argv[3] : "gif.gif";
     int scale = argc > 4 ? atoi(argv[4]) : 50 ;
-    int delay = argc > 5 ? atoi(argv[5]) : 25 ;
+    int delay = argc > 5 ? atoi(argv[5]) : 50 ;*/
     
     if (n == 0)
     {
-        printf("%s: Wrong number of iterations. Changing to default number\n", argv[0]);
+        printf("%s: Wrong number of iterations. Changing to default number(10)\n", argv[0]);
         n = 10;
     }
 
     if ( strstr(gif_name, ".gif\0")==NULL)
     {
-        printf("%s: Wrong gif filename. Changing to default name\n", argv[0]);
+        printf("%s: Wrong gif filename. Changing to default name(gif.gif)\n", argv[0]);
         gif_name = "gif.gif";
     }
 
     if (scale==0)
     {
-        printf("%s: Wrong scale. Changing to default number\n", argv[0]);
+        printf("%s: Wrong scale. Changing to default number(50)\n", argv[0]);
         scale = 50;
     }
     if (delay==0)
     {
-        printf("%s: Wrong delay. Changing to default number\n", argv[0]);
+        printf("%s: Wrong delay. Changing to default number(50=0,5s)\n", argv[0]);
         delay = 25;
     }
 
@@ -49,7 +99,6 @@ int main(int argc, char **argv)
         char* temp;
         int ni;
         int j;
-        printf("%i\n", i);
         printf("Operacja do wykonania:");
         /*temp = getc(stdin);
         temp = getc(stdin);*/
