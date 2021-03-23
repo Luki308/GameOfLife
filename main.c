@@ -11,8 +11,8 @@
 void programme_usage(char* argv)
 {
     printf("Uzycie: %s\n"
-        "-w [nazwa_swiata] - czytanie z podanego pliku\n"
         "-n [liczba_iteracji] - swiat zostanie wygenerowany do podanej generacji\n"
+        "-w [plik_wejsciowy] - czytanie swiata z podanego pliku\n"
         "-g [nazwa_gifu] - kolejne generacje beda zapisane do podanego pliku gif\n"
         "-s [skala] - przeskalowanie wielkosci w pliku gif\n"
         "-d [opoznienie] - z jakim opoznieniem beda pokazywane generacje w pliku gif\n"
