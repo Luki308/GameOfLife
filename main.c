@@ -18,6 +18,14 @@ void programme_usage(char* argv)
         "-d [opoznienie] - z jakim opoznieniem beda pokazywane generacje w pliku gif\n"
         , argv);
 }
+void usage()
+{
+    printf("a - przejscie do koncowej wersji swiata\n"
+        "f - wykonanie x iteracji\n"
+        "n - wykonanie kolejnej iteracji\n"
+        "d - wyswietlanie swiata\n"
+        "h - pokazanie pomocy\n");
+}
 
 int main(int argc, char **argv)
 {
@@ -159,11 +167,3 @@ int main(int argc, char **argv)
 }
 
 
-void usage()
-{
-    printf("a - przejscie do koncowej wersji swiata\n"
-           "f - wykonanie x iteracji\n"
-           "n - wykonanie kolejnej iteracji\n"
-           "d - wyswietlanie swiata\n"
-           "h - pokazanie pomocy\n");
-}
