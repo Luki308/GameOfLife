@@ -8,52 +8,90 @@
 #include <string.h>
 #include <getopt.h>
 
+
 void programme_usage(char* argv)
 {
-    printf("Uzycie: %s\n"
+    printf("\nUzycie: %s\n"
         "-n [liczba_iteracji] - swiat zostanie wygenerowany do podanej generacji\n"
         "-w [plik_wejsciowy] - czytanie swiata z podanego pliku\n"
-        "-g [nazwa_gifu] - kolejne generacje beda zapisane do podanego pliku gif\n"
+        "-g [nazwa_gifu] - kolejne generacje beda zapisane do podanego pliku gif (nazwa zakonczona na \".gif\")\n"
         "-s [skala] - przeskalowanie wielkosci w pliku gif\n"
-        "-d [opoznienie] - z jakim opoznieniem beda pokazywane generacje w pliku gif\n"
+        "-d [opoznienie] - z jakim opoznieniem beda pokazywane generacje w pliku gif (w setnych sekundy)\n\n"
         , argv);
 }
+
 void usage()
 {
-    printf("a - przejscie do koncowej wersji swiata\n"
-        "f - wykonanie x iteracji\n"
-        "n - wykonanie kolejnej iteracji\n"
-        "d - wyswietlanie swiata\n"
-        "h - pokazanie pomocy\n");
+    printf("\na [automatic] - przejscie do koncowej wersji swiata\n"
+        "f [fast forward] - wykonanie x iteracji\n"
+        "n [next] - wykonanie kolejnej iteracji\n"
+        "d [display] - wyswietlanie swiata\n"
+        "h [help] - pokazanie pomocy\n\n");
 }
+
+void generate(world_t world, int *i)
+{
+    update(world);
+    paint_frame(world);
+    (*i)++;
+} 
+
+// default values chosen when not specified
+#define N 20
+#define INPUT_FILE "glider.txt"
+#define GIF_NAME "generated_gif.gif"
+#define SCALE 50
+#define DELAY 25
+
 
 int main(int argc, char **argv)
 {
-    world_t w;
-    int n=0;
-    char* gif_name="";
-    int scale=0;
-    int delay=0;
+    world_t w = NULL;
+    int n = N;
+    char* gif_name = GIF_NAME;
+    char* input_file = INPUT_FILE;
+    int scale = SCALE;
+    int delay = DELAY;
 
     int opt;
-    while ((opt = getopt(argc, argv, "w:n:g:s:d:"))!= -1)
+    while ((opt = getopt(argc, argv, "w:n:g:s:d:")) != -1)
     {
         switch (opt)
         {
-        case 'w':
-            w = create_world(optarg);
-            break;
         case 'n':
             n = atoi(optarg);
+            if (n <= 0)
+            {
+                printf("%s: %d is wrong number of iterations. Changing to default number(%d)\n", argv[0], n, N);
+                n = N;
+            }
+            break;
+        case 'w':
+            input_file = optarg;
             break;
         case 'g':
-            gif_name = optarg;
+            gif_name = optarg;          
+            if (strstr(gif_name, ".gif\0") == NULL || strlen(gif_name) <= 4)
+            {
+                printf("%s: %s is wrong gif filename. Changing to default name(%s)\n", argv[0], gif_name, GIF_NAME);
+                gif_name = GIF_NAME;
+            }
             break;
         case 's':
             scale = atoi(optarg);
+            if (scale <= 0)
+            {
+                printf("%s: %d is wrong scale. Changing to default number(%d)\n", argv[0], scale, SCALE);
+                scale = SCALE;
+            }
             break;
         case 'd':
             delay = atoi(optarg);
+            if (delay < 6)
+            {
+                printf("%s: %d is wrong delay. Changing to default number(%d=%ds)\n", argv[0], delay, DELAY, DELAY/100);
+                delay = DELAY;
+            }
             break;
         default:
             programme_usage(argv[0]);
@@ -65,105 +103,79 @@ int main(int argc, char **argv)
         programme_usage(argv[0]);
         exit(EXIT_FAILURE);
     }
-        
-    //world_t w = create_world(argv[1]);
-    //if (w == NULL)
-      // free_world(w);
-    /*int n = argc > 2 ? atoi(argv[2]) : 10;
-    char* gif_name = argc > 3 ? argv[3] : "gif.gif";
-    int scale = argc > 4 ? atoi(argv[4]) : 50 ;
-    int delay = argc > 5 ? atoi(argv[5]) : 50 ;*/
     
-    if (n == 0)
-    {
-        printf("%s: Wrong number of iterations. Changing to default number(10)\n", argv[0]);
-        n = 10;
-    }
 
-    if ( strstr(gif_name, ".gif\0")==NULL)
+    w = create_world(input_file);
+    if(w == NULL)
     {
-        printf("%s: Wrong gif filename. Changing to default name(gif.gif)\n", argv[0]);
-        gif_name = "gif.gif";
+        printf("World is NULL!\n");
+        return EXIT_FAILURE;
     }
-
-    if (scale==0)
+    else   // if world has been created successfully
     {
-        printf("%s: Wrong scale. Changing to default number(50)\n", argv[0]);
-        scale = 50;
-    }
-    if (delay==0)
-    {
-        printf("%s: Wrong delay. Changing to default number(50=0,5s)\n", argv[0]);
-        delay = 25;
-    }
-
-    start_gif(gif_name, w->rows, w->columns, scale, delay);
-    paint_frame(w);          //adding first frame to gif
-    
-    usage();
-    int i=0;
-    while (i < n)
-    {
-        char* temp;
-        int ni;
-        int j;
-        printf("Operacja do wykonania:");
-        /*temp = getc(stdin);
-        temp = getc(stdin);*/
-        if(scanf("%s", temp) != 1)
+        if(start_gif(gif_name, w->rows, w->columns, scale, delay) != 0)
         {
-            fprintf(stderr, "%s: Cannot read character\n", argv[0]);
+            printf("Gif has not been initialized properly!\n");
+            return EXIT_FAILURE;
         }
+        else    // if gif has been initialized successfully
+        { 
+            paint_frame(w);     //adding first frame to gif
 
-        if (strlen(temp) != 1)
-        {
-            fprintf(stderr, "\n%s: Wrong argument.\n Please use one from below\n", argv[0]);
             usage();
-            continue;
-        }
-        switch (temp[0])
-        {
-        case 'a':
+            int i = 0;
             while (i < n)
             {
-                update(w);
-                paint_frame(w);
-                i++;
+                char command[256];
+
+                printf("Operacja do wykonania: \n");
+                if(scanf("%s", command) != 1)
+                {
+                    fprintf(stderr, "%s: Cannot read character\n", argv[0]);
+                }
+                if(strlen(command) > 1)
+                {
+                        printf("\nNie ma wieloznakowych polecen!\n");
+                        continue;
+                }
+
+                switch (command[0])
+                {
+                    case 'a':
+                        while (i < n)
+                        {
+                            generate(w, &i);
+                        }
+                        break;
+                    case 'f':
+                        printf("Ile iteracji do przodu: \n");
+                        int j;
+                        scanf("%d", &j);
+                        j += i;
+                        while (i < j && i < n)
+                        {
+                            generate(w, &i);
+                        }
+                        break;
+                    case 'n':
+                        generate(w, &i);
+                        break;
+                    case 'd':
+                        print_world(w, stdout, false);
+                        break;
+                    case 'h':
+                        usage();
+                        break;
+                    default:
+                        printf("\nNieznane polecenie!\nProsze uzywac tych widocznych ponizej:\n");
+                        usage();
+                        break;
+                }
             }
-            break;
-        case 'f':
-            printf("Ile iteracji do przodu:\n");
-            scanf("%d", &ni);
-            j = i;
-            while (i < j + ni && i<n)
-            {
-                update(w);
-                paint_frame(w);
-                i++;
-            }
-            break;
-        case 'n':
-            update(w);
-            paint_frame(w);
-            i++;
-            break;
-        case 'd':
-            print_world(w, stdout, 1);
-            break;
-        case 'h':
-            usage();
-           break;
-        default:
-            usage();
-            break;
+            finish_gif();
+            printf("\nPlik gif \"%s\" zostal utworzony prawidlowo!\n\n", gif_name);
         }
+        free_world(w);    
+        return EXIT_SUCCESS;
     }
-    finish_gif();
-    print_world(w, stdout, 1);
-    if(w != NULL)
-        free_world(w);
-
-    return 0;
 }
-
-

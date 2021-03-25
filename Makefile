@@ -7,4 +7,4 @@ clean:
 	-rm *.o
 
 clean_all: clean
-	-rm GameOfLife
+	-rm GameOfLife *.gif

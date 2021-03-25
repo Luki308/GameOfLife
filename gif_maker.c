@@ -1,11 +1,11 @@
 #include "gifenc.h"
 #include "data.h"
 
-static ge_GIF *gif;
-static int scale;
-static int delay;
+static ge_GIF *gif = NULL;
+static int scale = 50;
+static int delay = 50;
 
-void start_gif(char* name, int rows, int columns, int given_scale, int given_delay)
+int start_gif(char* name, int rows, int columns, int given_scale, int given_delay)
 {
     scale = given_scale;
     delay = given_delay;
@@ -19,6 +19,8 @@ void start_gif(char* name, int rows, int columns, int given_scale, int given_del
         1,  // palette depth == log2(x)  (x - number of colors)
         0   // infinite loop
     );
+    if(gif != NULL) return 0;
+    else return -1;
 }
 
 void paint_frame(world_t world)
