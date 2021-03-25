@@ -177,7 +177,10 @@ int main(int argc, char **argv)
                         break;
                     case 's':
                         memset(save_file,'\0',strlen(save_file));
-                        strncpy(save_file, filename, strlen(filename) - strlen(strstr(filename, ".txt\0")));
+                        if(strstr(filename, ".txt\0") != NULL)
+                            strncpy(save_file, filename, strlen(filename) - 4);
+                        else
+                            strncpy(save_file, filename, strlen(filename));
                         char suffix[10];
                         snprintf(suffix, 10, "%d.txt", i);
                         strcat(save_file, suffix);
