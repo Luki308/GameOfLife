@@ -128,11 +128,7 @@ int main(int argc, char **argv)
 
             // some operations related to saving to input file
             char *filename;
-            if((filename = strrchr(input_file, '/')) != NULL)
-                filename++;
-            else if((filename = strrchr(input_file, '\\')) != NULL)
-                filename++;
-            else filename = input_file;
+            filename = get_filename(input_file);
             char *save_file = malloc(sizeof filename + 5);    // name of generated input file (+5 to give space for number of generation)
 
             int i = 0;
@@ -176,18 +172,7 @@ int main(int argc, char **argv)
                         print_world(w, stdout, false);
                         break;
                     case 's':
-                        memset(save_file,'\0',strlen(save_file));
-                        if(strstr(filename, ".txt\0") != NULL)
-                            strncpy(save_file, filename, strlen(filename) - 4);
-                        else
-                            strncpy(save_file, filename, strlen(filename));
-                        char suffix[10];
-                        snprintf(suffix, 10, "%d.txt", i);
-                        strcat(save_file, suffix);
-                        FILE *out = fopen(save_file,"w");
-                        print_world(w, out, true);
-                        printf("Zapisano do pliku: %s\n",save_file);
-                        fclose(out);
+                        save_to_file(save_file, filename, w,i);
                         break;
                     case 'h':
                         usage();

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define BUFFER_SIZE 256 // max length of input word (only first letter matters)
 
@@ -149,4 +150,32 @@ void store_world(world_t world, char *filename) // makes input file from current
         return;
     }
     print_world(world, out, 1);
+}
+
+char* get_filename(char* input_file)
+{
+    char* filename;
+    if ((filename = strrchr(input_file, '/')) != NULL)
+        filename++;
+    else if ((filename = strrchr(input_file, '\\')) != NULL)
+        filename++;
+    else filename = input_file;
+
+    return filename;
+}
+
+void save_to_file(char* save_file, char* filename, world_t world, int i)
+{
+    memset(save_file, '\0', strlen(save_file));
+    if (strstr(filename, ".txt\0") != NULL)
+        strncpy(save_file, filename, strlen(filename) - 4);
+    else
+        strncpy(save_file, filename, strlen(filename));
+    char suffix[10];
+    snprintf(suffix, 10, "%d.txt", i);
+    strcat(save_file, suffix);
+    FILE* out = fopen(save_file, "w");
+    print_world(world, out, true);
+    printf("Zapisano do pliku: %s\n", save_file);
+    fclose(out);
 }
