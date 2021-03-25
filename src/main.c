@@ -41,7 +41,7 @@ void generate(world_t world, int *i)
 
 // default values chosen when not specified
 #define N 20
-#define INPUT_FILE "swarm.txt"
+#define INPUT_FILE "examples/swarm.txt"
 #define GIF_NAME "generated_gif.gif"
 #define SCALE 50
 #define DELAY 25
@@ -124,8 +124,17 @@ int main(int argc, char **argv)
         else    // if gif has been initialized successfully
         { 
             paint_frame(w);     //adding first frame to gif
-
             usage();
+
+            // some operations related to saving to input file
+            char *filename;
+            if((filename = strrchr(input_file, '/')) != NULL)
+                filename++;
+            else if((filename = strrchr(input_file, '\\')) != NULL)
+                filename++;
+            else filename = input_file;
+            char *save_file = malloc(sizeof filename + 5);    // name of generated input file (+5 to give space for number of generation)
+
             int i = 0;
             while (i < n)
             {
@@ -166,18 +175,15 @@ int main(int argc, char **argv)
                     case 'd':
                         print_world(w, stdout, false);
                         break;
-                    case 's': ; 
-                        char *save_file = malloc(sizeof input_file + 5);
-                        if (strstr(input_file, ".txt\0") != NULL)
-                            strncpy(save_file, input_file, strlen(input_file)-4);
-                        else
-                            strncpy(save_file, input_file, strlen(input_file));
+                    case 's':
+                        memset(save_file,'\0',strlen(save_file));
+                        strncpy(save_file, filename, strlen(filename) - strlen(strstr(filename, ".txt\0")));
                         char suffix[10];
                         snprintf(suffix, 10, "%d.txt", i);
                         strcat(save_file, suffix);
                         FILE *out = fopen(save_file,"w");
                         print_world(w, out, true);
-                        free(save_file);
+                        printf("Zapisano do pliku: %s\n",save_file);
                         fclose(out);
                         break;
                     case 'h':
@@ -189,6 +195,7 @@ int main(int argc, char **argv)
                         break;
                 }
             }
+            free(save_file);
             finish_gif();
             printf("\nPlik gif \"%s\" zostal utworzony prawidlowo!\n\n", gif_name);
         }

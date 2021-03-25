@@ -1,10 +1,17 @@
-GameOfLife: main.o data.o arrays.o gif_maker.o gifenc.o game_of_life.o
-	$(CC) -o GameOfLife main.o data.o arrays.o gif_maker.o gifenc.o game_of_life.o
+GameOfLife: src/main.o src/data.o src/arrays.o src/gif_maker.o src/gifenc.o src/game_of_life.o
+	$(CC) -o GameOfLife src/main.o src/data.o src/arrays.o src/gif_maker.o src/gifenc.o src/game_of_life.o
+
+
+
+
+
+
+
 
 .PHONY: clean clean_all
 
 clean: 
-	-rm *.o
+	-rm src/*.o
 
 clean_all: clean
-	-rm GameOfLife *.gif
+	-rm GameOfLife *.gif *.txt
