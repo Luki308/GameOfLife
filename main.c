@@ -36,6 +36,8 @@ void generate(world_t world, int *i)
     (*i)++;
 } 
 
+#define BUFFER_SIZE 256 // max length of input word (only first letter matters)
+
 // default values chosen when not specified
 #define N 20
 #define INPUT_FILE "glider.txt"
@@ -126,7 +128,7 @@ int main(int argc, char **argv)
             int i = 0;
             while (i < n)
             {
-                char command[256];
+                char command[BUFFER_SIZE];
 
                 printf("Operacja do wykonania: \n");
                 if(scanf("%s", command) != 1)

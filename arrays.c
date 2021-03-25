@@ -1,4 +1,4 @@
-#include "const_char_arrays.h"
+#include "arrays.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -6,6 +6,13 @@ bool check_if_char_in_array(char c, const char array[], int array_len)
 {
     for(int i = 0; i < array_len; i++)
         if(c == array[i]) return true;
+    return false;
+}
+
+bool check_if_int_in_array(int x, const int array[], int array_len)
+{
+    for(int i = 0; i < array_len; i++)
+        if(x == array[i]) return true;
     return false;
 }
 

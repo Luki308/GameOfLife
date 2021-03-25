@@ -1,13 +1,13 @@
 #include "data.h"
-#include "const_char_arrays.h"
+#include "arrays.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #define BUFFER_SIZE 256 // max length of input word (only first letter matters)
 
-const char cell_states[2] = { '0', '1' };
-const int number_of_cell_states = sizeof cell_states / sizeof cell_states[0];
+static const char cell_states[2] = { '0', '1' };
+static const int number_of_cell_states = sizeof cell_states / sizeof cell_states[0];
 
 
 void free_world(world_t world) // cleans memory after world usage
