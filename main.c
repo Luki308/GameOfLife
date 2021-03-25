@@ -26,6 +26,7 @@ void usage()
         "f [fast forward] - wykonanie x iteracji\n"
         "n [next] - wykonanie kolejnej iteracji\n"
         "d [display] - wyswietlanie swiata\n"
+        "s [save] - zapisanie biezacej iteracji jako plik wejsciowy\n"
         "h [help] - pokazanie pomocy\n\n");
 }
 
@@ -40,7 +41,7 @@ void generate(world_t world, int *i)
 
 // default values chosen when not specified
 #define N 20
-#define INPUT_FILE "glider.txt"
+#define INPUT_FILE "swarm.txt"
 #define GIF_NAME "generated_gif.gif"
 #define SCALE 50
 #define DELAY 25
@@ -56,7 +57,7 @@ int main(int argc, char **argv)
     int delay = DELAY;
 
     int opt;
-    while ((opt = getopt(argc, argv, "w:n:g:s:d:")) != -1)
+    while ((opt = getopt(argc, argv, "n:w:g:s:d:")) != -1)
     {
         switch (opt)
         {
@@ -164,6 +165,20 @@ int main(int argc, char **argv)
                         break;
                     case 'd':
                         print_world(w, stdout, false);
+                        break;
+                    case 's': ; 
+                        char *save_file = malloc(sizeof input_file + 5);
+                        if (strstr(input_file, ".txt\0") != NULL)
+                            strncpy(save_file, input_file, strlen(input_file)-4);
+                        else
+                            strncpy(save_file, input_file, strlen(input_file));
+                        char suffix[10];
+                        snprintf(suffix, 10, "%d.txt", i);
+                        strcat(save_file, suffix);
+                        FILE *out = fopen(save_file,"w");
+                        print_world(w, out, true);
+                        free(save_file);
+                        fclose(out);
                         break;
                     case 'h':
                         usage();
